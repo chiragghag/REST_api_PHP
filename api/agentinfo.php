@@ -1,18 +1,22 @@
 <?php
 include_once("php_includes/db_conx.php");
 //Select data from database
-if(isset($_GET["email"]) && isset($_GET["sellrent"])){
+if((isset($_GET["email"]) || isset($_GET["uid"])) && isset($_GET["sellrent"])){
 $email = $_GET["email"];
+$uid = $_GET["uid"];
 $sellrent = $_GET["sellrent"];
-$getData = "SELECT tu.uid, tu.email, tu.phoneno, tud.bname, tud.aname, tud.altno, tud.locality, tud.logo FROM tbl_users tu JOIN tbl_userdetails tud ON tu.uid=tud.uid where email = '$email'";
+$getData = "SELECT tu.uid, tu.email, tu.phoneno, tud.bname, tud.aname, tud.altno, tud.locality, tud.logo FROM tbl_users tu JOIN tbl_userdetails tud ON tu.uid=tud.uid where tu.email = '$email' OR tu.uid = '$uid'";
 $qur = $db_conx->query($getData);
 
 $numrows = mysqli_num_rows($qur);
 if($numrows < 1){
-$msg[] = array("error" => "Agent Not Found");
+$msg = array();
 }
 
 while($r = mysqli_fetch_assoc($qur)){
+
+$agentinfo = array("phoneno" => $r['phoneno'], "email" => $r['email'] ,"bname" => $r['bname'], "aname" => $r['aname'], "altno" => $r['altno'],"locality" => $r['locality']);	
+
 $countquery="SELECT COUNT(tp.pid) AS 'count' FROM `tbl_properties` tp JOIN `tbl_users` tu ON tp.uid=tu.uid WHERE tu.email='$email'";
 $qur1 = $db_conx->query($countquery);
 $uid = $r['uid'];
@@ -73,11 +77,28 @@ $propList = array();
 }
 
 while($r2 = mysqli_fetch_assoc($qur2)){
-$propList[] = array("Cost" => $r2['Cost'],"Rent" => $r2['Rent'],"Deposite" => $r2['Deposite'],"Address" => $r2['Address'],"Locality" => $r2['Locality'],"Type" => $r2['Type'],"Floor" => $r2['Floor'],"Area" => $r2['Area'],"Brokerage" => $r2['Brokerage'],"Rescom" => $r2['R/C'],"Date" => $r2['Date'],"pid" => $r2['pid']);
+	
+if(strtolower(trim($r2['Cost'])) == strtolower("0")){
+$cost=intval($r2['Cost']);
+}else{
+$cost=$r2['Cost'];
+}
+if(strtolower(trim($r2['Rent'])) == strtolower("0")){
+$Rent=intval($r2['Rent']);
+}else{
+$Rent=$r2['Rent'];
+}
+if(strtolower(trim($r2['Deposite'])) == strtolower("0")){
+$Deposite=intval($r2['Deposite']);
+}else{
+$Deposite=$r2['Deposite'];
+}
+
+$propList[] = array("Cost" => $cost,"Rent" => $Rent,"Deposite" => $Deposite,"Address" => $r2['Address'],"Locality" => $r2['Locality'],"Type" => $r2['Type'],"Floor" => $r2['Floor'],"Area" => $r2['Area'],"Brokerage" => $r2['Brokerage'],"Rescom" => $r2['R/C'],"Date" => $r2['Date'],"pid" => $r2['pid'],"agentInfo" => $agentinfo);
 }
 //while($r1 = mysqli_fetch_assoc($qur1)){
 $r1 = mysqli_fetch_assoc($qur1);
-$msg[] = array("phoneno" => $r['phoneno'], "email" => $r['email'] ,"bname" => $r['bname'], "aname" => $r['aname'], "altno" => $r['altno'],"locality" => $r['locality'],"logo" => $r['logo'], "propertycount" => intval($r1['count']), "properties" => $propList);
+$msg[] = array("phoneno" => $r['phoneno'], "uid" => $r['uid'], "email" => $r['email'] ,"bname" => $r['bname'], "aname" => $r['aname'], "altno" => $r['altno'],"locality" => $r['locality'],"logo" => $r['logo'], "propertycount" => intval($r1['count']), "properties" => $propList);
 }
 }
 else{

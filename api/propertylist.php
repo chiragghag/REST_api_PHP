@@ -110,8 +110,8 @@ END)END)END)END)END)END)END)END)END)END)END)END)END)END)END)END)END),\" Flr\") A
 ,CONCAT(t.area,\" SqFt\")AS 'Area' , 
 t.directside AS 'Brokerage',
 t.rescom AS 'R/C',
-DATE_FORMAT(t.lastupdate,'%d %M %Y') AS \"Date\"
-
+DATE_FORMAT(t.lastupdate,'%d %M %Y') AS \"Date\",
+t.uid
 FROM tbl_properties t 
 WHERE t.city = '$city'
 AND t.town = '$town'
@@ -126,11 +126,34 @@ $qur2 = $db_conx->query($propData);
 
 $numrows = mysqli_num_rows($qur2);
 if($numrows < 1){
-$msg2[] = array();
+$msg2 = array();
 }
 else{
 while($r2 = mysqli_fetch_assoc($qur2)){
-$msg[] = array("Cost" => $r2['Cost'],"Rent" => $r2['Rent'],"Deposite" => $r2['Deposite'],"Address" => $r2['Address'],"Locality" => $r2['Locality'],"Type" => $r2['Type'],"Floor" => $r2['Floor'],"Area" => $r2['Area'],"Brokerage" => $r2['Brokerage'],"Rescom" => $r2['R/C'],"Date" => $r2['Date'],"pid" => $r2['pid']);
+
+$uid=$r2['uid'];
+$getData = "SELECT tu.uid, tu.email, tu.phoneno, tud.bname, tud.aname, tud.altno, tud.locality FROM tbl_users tu JOIN tbl_userdetails tud ON tu.uid=tud.uid where tu.uid = '$uid'";
+$qur = $db_conx->query($getData);
+$r = mysqli_fetch_assoc($qur);
+$agentinfo = array("phoneno" => $r['phoneno'], "email" => $r['email'] ,"bname" => $r['bname'], "aname" => $r['aname'], "altno" => $r['altno'],"locality" => $r['locality']);
+
+if(strtolower(trim($r2['Cost'])) == strtolower("0")){
+$cost=intval($r2['Cost']);
+}else{
+$cost=$r2['Cost'];
+}
+if(strtolower(trim($r2['Rent'])) == strtolower("0")){
+$Rent=intval($r2['Rent']);
+}else{
+$Rent=$r2['Rent'];
+}
+if(strtolower(trim($r2['Deposite'])) == strtolower("0")){
+$Deposite=intval($r2['Deposite']);
+}else{
+$Deposite=$r2['Deposite'];
+}
+	
+$msg[] = array("Cost" => $cost,"Rent" => $Rent,"Deposite" => $Deposite,"Address" => $r2['Address'],"Locality" => $r2['Locality'],"Type" => $r2['Type'],"Floor" => $r2['Floor'],"Area" => $r2['Area'],"Brokerage" => $r2['Brokerage'],"Rescom" => $r2['R/C'],"Date" => $r2['Date'],"pid" => $r2['pid'],"agentinfo" => $agentinfo);
 }
 
 $countqueryproperty="SELECT COUNT(*) AS 'count' FROM tbl_properties t 
@@ -145,7 +168,7 @@ AND CONCAT_WS(t.locality, t.type, t.rescom, t.floor) LIKE '%$search%'";
 $qur2 = $db_conx->query($countqueryproperty);
 //while($r1 = mysqli_fetch_assoc($qur1)){
 $r2 = mysqli_fetch_assoc($qur2);
-$msg2[] = array("propertylist" => $msg, "propertycount" => $r2['count']);
+$msg2[] = array("propertylist" => $msg, "propertycount" => intval($r2['count']));
 
 }
 }

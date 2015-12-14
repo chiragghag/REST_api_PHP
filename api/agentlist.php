@@ -16,7 +16,7 @@ $qur = $db_conx->query($getData);
 
 $numrows = mysqli_num_rows($qur);
 if($numrows < 1){
-$msg2[] = array();
+$msg2 = array();
 }
 else {
 while($r = mysqli_fetch_assoc($qur)){
@@ -39,7 +39,7 @@ $countqueryagent="SELECT COUNT(*) AS 'count' FROM tbl_users tu JOIN tbl_userdeta
 $qur2 = $db_conx->query($countqueryagent);
 //while($r1 = mysqli_fetch_assoc($qur1)){
 $r2 = mysqli_fetch_assoc($qur2);
-$msg2[] = array("agentlist" => $msg, "agentcount" => $r2['count']);
+$msg2[] = array("agentlist" => $msg, "agentcount" => intval($r2['count']));
 }
 }
 else{

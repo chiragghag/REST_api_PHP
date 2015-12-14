@@ -66,15 +66,30 @@ $countquery="SELECT COUNT(tp.pid) AS 'count' FROM `tbl_properties` tp JOIN `tbl_
 $qur1 = $db_conx->query($countquery);
 $r1 = mysqli_fetch_assoc($qur1);
 $r = mysqli_fetch_assoc($qur);
-$agentinfo[] = array("phoneno" => $r['phoneno'], "email" => $r['email'] ,"bname" => $r['bname'], "aname" => $r['aname'], "altno" => $r['altno'],"locality" => $r['locality'], "propertycount" => $r1['count']);
+$agentinfo[] = array("phoneno" => $r['phoneno'], "email" => $r['email'] ,"bname" => $r['bname'], "aname" => $r['aname'], "altno" => $r['altno'],"locality" => $r['locality'], "propertycount" => intval($r1['count']));
 
 $numrows = mysqli_num_rows($qur);
 if($numrows < 1){
 $agentinfo[] = array("error" => "Agent Not Found");
 }
 
+if(strtolower(trim($r2['Cost'])) == strtolower("0")){
+$cost=intval($r2['Cost']);
+}else{
+$cost=$r2['Cost'];
+}
+if(strtolower(trim($r2['Rent'])) == strtolower("0")){
+$Rent=intval($r2['Rent']);
+}else{
+$Rent=$r2['Rent'];
+}
+if(strtolower(trim($r2['Deposite'])) == strtolower("0")){
+$Deposite=intval($r2['Deposite']);
+}else{
+$Deposite=$r2['Deposite'];
+}
 
-$msg[] = array("Cost" => $r2['Cost'],"Rent" => $r2['Rent'],"Deposite" => $r2['Deposite'],"Address" => $r2['Address'],"Locality" => $r2['Locality'],"Type" => $r2['Type'],"Floor" => $r2['Floor'],"Area" => $r2['Area'],"Brokerage" => $r2['Brokerage'],"Rescom" => $r2['R/C'],"Date" => $r2['Date'],"pid" => $r2['pid'],"agentinfo" => $agentinfo);
+$msg[] = array("Cost" => $cost,"Rent" => $Rent,"Deposite" => $Deposite,"Address" => $r2['Address'],"Locality" => $r2['Locality'],"Type" => $r2['Type'],"Floor" => $r2['Floor'],"Area" => $r2['Area'],"Brokerage" => $r2['Brokerage'],"Rescom" => $r2['R/C'],"Date" => $r2['Date'],"pid" => $r2['pid'],"agentinfo" => $agentinfo);
 }
 }
 else{

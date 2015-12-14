@@ -8,6 +8,10 @@ $city = "";
 $getData = "SELECT ";
 if(isset($_GET["city"])){
 $city = $_GET["city"];
+if(strtolower(trim($city)) == strtolower("MUMBAI")){
+$msg[] = array("town" => "MIRA ROAD - E");
+}
+
 $getData .= " town";	
 $temp .= " WHERE city = '$city'";
 }
@@ -17,6 +21,8 @@ $getData .= " DISTINCT city";
 $getData .= " FROM tbl_citytown";
 $getData .= $temp;
 $qur = $db_conx->query($getData);
+
+
 
 while($r = mysqli_fetch_assoc($qur)){
 if(isset($_GET["city"])){
